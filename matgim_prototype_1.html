@@ -1,0 +1,814 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>맡김</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Gowun+Batang:wght@700&display=swap">
+<style>
+:root{
+  --bg:#ECEAE0; --paper:#FAF7F0; --surface:#FFFFFF; --ink:#1C2620; --ink-2:#4A554F; --muted:#7A847E;
+  --line:#D9DED7; --line-strong:#B8C0B9;
+  --green:#1F6F4E; --green-ink:#FFFFFF; --green-soft:#E3F0E9;
+  --yellow:#E9A93B; --yellow-soft:#F6E7C8; --yellow-ink:#3A2E08;
+  --blue:#3C6E9F; --blue-soft:#E4EDF6;
+  --red:#B9483D; --red-soft:#F7E3E0;
+  --shadow:0 18px 50px rgba(28,38,32,.16);
+  --radius:22px;
+  --fs:1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10150F; --paper:#171D18; --surface:#1F2721; --ink:#EDEFE8; --ink-2:#BEC5BD; --muted:#8B958D;
+    --line:#2C352E; --line-strong:#465049;
+    --green:#4FB585; --green-ink:#0E1A13; --green-soft:#1D3328;
+    --yellow:#E8B84A; --yellow-soft:#3A3016; --yellow-ink:#F7E7B8;
+    --blue:#7FAEDC; --blue-soft:#1B2A3A;
+    --red:#E07A6E; --red-soft:#3B2220;
+    --shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10150F; --paper:#171D18; --surface:#1F2721; --ink:#EDEFE8; --ink-2:#BEC5BD; --muted:#8B958D;
+  --line:#2C352E; --line-strong:#465049;
+  --green:#4FB585; --green-ink:#0E1A13; --green-soft:#1D3328;
+  --yellow:#E8B84A; --yellow-soft:#3A3016; --yellow-ink:#F7E7B8;
+  --blue:#7FAEDC; --blue-soft:#1B2A3A;
+  --red:#E07A6E; --red-soft:#3B2220;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- stage ---------- */
+.stage{min-height:100vh;display:grid;grid-template-columns:1fr minmax(0,420px) minmax(280px,360px) 1fr;gap:36px;align-items:start;padding:36px 20px}
+.stage>.spacer{min-width:0}
+.phone{grid-column:2;position:sticky;top:36px;width:100%;max-width:420px;height:min(880px,calc(100vh - 72px));min-height:640px;background:var(--paper);border-radius:44px;box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.status b{color:var(--ink);font-weight:700}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 22px 28px;display:flex;flex-direction:column;font-size:calc(17px * var(--fs))}
+.screen::-webkit-scrollbar{width:0}
+.side{grid-column:3;position:sticky;top:36px;display:flex;flex-direction:column;gap:18px}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;gap:20px;padding:16px 12px}
+  .phone{grid-column:1;position:static;margin:0 auto;height:auto;min-height:calc(100vh - 32px);border-radius:28px}
+  .side{grid-column:1;position:static;max-width:420px;margin:0 auto}
+  .spacer{display:none}
+}
+
+/* ---------- side panel ---------- */
+.brand{display:flex;align-items:center;gap:14px}
+.appicon{width:64px;height:64px;border-radius:22%;overflow:hidden;flex:none;box-shadow:0 6px 18px rgba(28,38,32,.18)}
+.appicon svg{display:block;width:100%;height:100%}
+.logo-sm{width:36px;height:36px;border-radius:26%;overflow:hidden;flex:none}
+.logo-sm svg{display:block;width:100%;height:100%}
+.wordmark{font-family:"Gowun Batang",serif;font-weight:700;font-size:1.25em;color:var(--green);letter-spacing:-.01em}
+.brand .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:28px;color:var(--green);letter-spacing:-.01em}
+.brand .tag{font-size:13px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.panel h4{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.panel .now{font-size:18px;font-weight:900;margin:0 0 6px}
+.panel p{margin:0;font-size:14px;color:var(--ink-2)}
+.chain{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.chain li{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);padding:4px 0}
+.chain li i{width:10px;height:10px;border-radius:50%;border:2px solid var(--line-strong);flex:none;display:inline-block}
+.chain li.done{color:var(--ink-2)}
+.chain li.done i{background:var(--green);border-color:var(--green)}
+.chain li.now{color:var(--ink);font-weight:700}
+.chain li.now i{border-color:var(--yellow);background:var(--yellow)}
+.jump{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.jump button{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--ink-2)}
+.jump button:hover{border-color:var(--green);color:var(--green)}
+.side .note{font-size:12px;color:var(--muted);padding:0 4px}
+
+/* ---------- app primitives ---------- */
+.top{display:flex;align-items:center;gap:8px;min-height:52px;flex:none;margin-bottom:6px}
+.top .back{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;display:grid;place-items:center;margin-left:-6px}
+.top .ttl{font-size:1em;font-weight:700;color:var(--ink-2);flex:1}
+.top .a11y{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700}
+.top .a11y.on{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+h1{font-size:1.65em;line-height:1.28;font-weight:900;margin:8px 0 8px;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:1.2em;font-weight:900;margin:22px 0 10px;letter-spacing:-.01em}
+.lead{color:var(--ink-2);margin:0 0 18px;font-size:1em}
+.small{font-size:.82em;color:var(--muted)}
+.grow{flex:1}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center}
+
+.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:64px;border-radius:18px;border:2px solid transparent;font-size:1.1em;font-weight:900;padding:14px 18px;text-align:center;letter-spacing:-.01em;transition:transform .08s}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--green);color:var(--green-ink)}
+.btn.secondary{background:var(--surface);border-color:var(--line-strong);color:var(--ink)}
+.btn.yellow{background:var(--yellow);color:var(--yellow-ink)}
+.btn.ghost{background:transparent;min-height:48px;font-size:.95em;font-weight:700;color:var(--ink-2)}
+.btn.danger{background:var(--red-soft);color:var(--red)}
+.btn .sub{display:block;font-size:.72em;font-weight:500;opacity:.85}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tiles.one{grid-template-columns:1fr}
+.tile{min-height:88px;border-radius:18px;border:2px solid var(--line);background:var(--surface);padding:14px 14px;text-align:left;font-size:1em;font-weight:700;display:flex;flex-direction:column;justify-content:center;gap:4px;line-height:1.3;position:relative}
+.tile .ic{font-size:1.45em;line-height:1}
+.tile .d{font-size:.78em;font-weight:500;color:var(--muted)}
+.tile.sel{border-color:var(--green);background:var(--green-soft)}
+.tile.sel::after{content:"✓";position:absolute;top:8px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--green);color:var(--green-ink);font-size:14px;display:grid;place-items:center;font-weight:900}
+.tile.wide{grid-column:1/-1;min-height:64px;flex-direction:row;align-items:center;justify-content:space-between;font-weight:500;color:var(--ink-2);border-style:dashed}
+
+.progress{display:flex;gap:5px;margin:4px 0 14px}
+.progress i{flex:1;height:7px;border-radius:4px;background:var(--line)}
+.progress i.on{background:var(--green)}
+.progress i.now{background:var(--yellow)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card.flat{background:transparent;border-style:dashed}
+.card h3{margin:0 0 4px;font-size:1.05em;font-weight:900}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.95em}
+.kv dt{color:var(--muted);font-weight:500}
+.kv dd{margin:0;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:.78em;font-weight:700;line-height:1.3}
+.pill.g{background:var(--green-soft);color:var(--green)}
+.pill.y{background:var(--yellow-soft);color:var(--yellow-ink)}
+.pill.b{background:var(--blue-soft);color:var(--blue)}
+.pill.r{background:var(--red-soft);color:var(--red)}
+.pill.n{background:var(--bg);color:var(--muted)}
+
+.fit{display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--line);border-radius:20px;background:var(--surface);text-align:left;width:100%}
+.fit .ic{font-size:2em;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--bg);flex:none}
+.fit .body{flex:1;min-width:0}
+.fit .name{font-weight:900;font-size:1.05em}
+.fit .why{font-size:.85em;color:var(--ink-2);margin-top:2px}
+.fit.best{border-color:var(--green);box-shadow:0 0 0 4px var(--green-soft)}
+.fit .arrow{color:var(--muted);font-size:1.3em}
+.fit.dim{opacity:.6}
+
+.creator{border:2px solid var(--line);border-radius:22px;background:var(--surface);overflow:hidden}
+.avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;font-size:1.1em;flex:none}
+.creator .hd{display:flex;gap:12px;padding:16px 16px 8px;align-items:center}
+.creator .nm{font-weight:900;font-size:1.05em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.creator .hnd{font-size:.8em;color:var(--muted);font-weight:500}
+.creator .meta{font-size:.82em;color:var(--muted)}
+.creator .nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 16px 0}
+.creator .nums div{background:var(--bg);border-radius:12px;padding:8px 10px;text-align:center}
+.creator .nums b{display:block;font-size:1.05em;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.creator .nums span{font-size:.72em;color:var(--muted)}
+.creator .sec{padding:12px 16px 0;font-size:.78em;color:var(--muted);font-weight:700;letter-spacing:.02em}
+.creator .reels{display:flex;gap:6px;padding:6px 16px 0;overflow-x:auto;scrollbar-width:none}
+.creator .reels::-webkit-scrollbar{display:none}
+.creator .reels span{flex:none;width:112px;aspect-ratio:9/13;border-radius:10px;display:flex;flex-direction:column;justify-content:space-between;padding:8px;font-size:.68em;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6);line-height:1.25}
+.creator .reels em{font-style:normal;font-size:1.05em;opacity:.95;font-variant-numeric:tabular-nums}
+.creator .why{margin:10px 16px 0;font-size:.88em;color:var(--ink-2);padding:10px 12px;background:var(--green-soft);border-radius:12px;line-height:1.5}
+.creator .why b{color:var(--green)}
+.creator .pk{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px 0;font-size:.92em}
+.creator .price{font-size:1.25em;font-weight:900;font-variant-numeric:tabular-nums;flex:none}
+.creator .act{padding:12px 16px 16px}
+
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;font-size:.95em;line-height:1.7}
+.brief .hd{font-size:.78em;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:8px;text-transform:uppercase}
+.brief p{margin:0 0 8px}
+.brief mark{background:var(--yellow-soft);color:var(--ink);padding:0 3px;border-radius:4px}
+
+.input{width:100%;min-height:64px;border:2px solid var(--line-strong);border-radius:18px;background:var(--surface);color:var(--ink);font:inherit;font-size:1.05em;padding:14px 18px}
+.input:focus{outline:3px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.scan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;font-size:.95em}
+.scan li{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.scan li::before{content:"";width:22px;height:22px;border-radius:50%;border:3px solid var(--line);flex:none}
+.scan li.on{color:var(--ink);font-weight:700}
+.scan li.on::before{background:var(--green);border-color:var(--green);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.photos span{aspect-ratio:1;border-radius:10px;display:flex;align-items:flex-end;padding:6px;font-size:.7em;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.sec2{font-size:.78em;color:var(--muted);font-weight:700;margin-top:12px}
+.kws{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.kws span{background:var(--bg);border-radius:999px;padding:5px 11px;font-size:.82em;font-weight:700}
+.kws b{color:var(--green);font-variant-numeric:tabular-nums}
+.brief h4{margin:16px 0 6px;font-size:.78em;letter-spacing:.04em;color:var(--green);font-weight:900;text-transform:uppercase}
+.brief h4:first-of-type{margin-top:10px}
+.brief ul{margin:0;padding-left:1.1em}
+.brief li{margin:0 0 4px}
+.brief .conti{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:.92em}
+.brief .conti b{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.brief .q{border-left:3px solid var(--yellow);padding-left:10px;color:var(--ink-2);margin:0 0 6px;font-size:.92em}
+.srcs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:0 0 18px;position:relative}
+.timeline li::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--line)}
+.timeline li:last-child::before{display:none}
+.timeline .dot{width:28px;height:28px;border-radius:50%;border:3px solid var(--line-strong);background:var(--paper);display:grid;place-items:center;font-size:13px;font-weight:900}
+.timeline li.done .dot{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.timeline li.now .dot{border-color:var(--yellow);background:var(--yellow);color:var(--yellow-ink)}
+.timeline .t{font-weight:900}
+.timeline .s{font-size:.85em;color:var(--muted)}
+.timeline li.wait{opacity:.55}
+
+.video{aspect-ratio:9/12;border-radius:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff;background:linear-gradient(160deg,#5b3a1e,#1b3a2a 60%,#0d1f16)}
+.video::before{content:"▶";position:absolute;inset:0;display:grid;place-items:center;font-size:52px;opacity:.85}
+.video .cap{font-weight:900;font-size:1.05em;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.video .by{font-size:.8em;opacity:.9}
+
+.stat{display:flex;align-items:baseline;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.stat:last-child{border-bottom:0}
+.stat .n{font-size:1.8em;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em;min-width:3.2ch;text-align:right}
+.stat .l{font-size:1em;color:var(--ink-2)}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:5px}
+
+.feed{display:flex;flex-direction:column;gap:14px}
+.reel{border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.reel .thumb{aspect-ratio:16/10;display:flex;align-items:flex-end;padding:14px;color:#fff;position:relative}
+.reel .thumb::after{content:"예시";position:absolute;top:10px;right:10px;font-size:11px;background:rgba(0,0,0,.45);padding:2px 8px;border-radius:999px}
+.reel .thumb b{font-size:1.1em;text-shadow:0 1px 3px rgba(0,0,0,.6);line-height:1.3}
+.reel .bd{padding:12px 14px 14px}
+.reel .bd p{margin:4px 0 10px;font-size:.9em;color:var(--ink-2)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin:0 -22px;padding-left:22px;padding-right:22px}
+.chips button{flex:none;border-radius:999px;padding:8px 14px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:.9em}
+.chips button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.like{border-radius:14px;border:2px solid var(--line);background:var(--surface);padding:10px 14px;font-weight:700;font-size:.92em;width:100%}
+.like.on{border-color:var(--yellow);background:var(--yellow-soft);color:var(--yellow-ink)}
+
+.toast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:14px;font-weight:700;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;max-width:90%}
+.toast.show{opacity:1}
+.home-hero{background:var(--green);color:var(--green-ink);border-radius:26px;padding:22px 22px 20px;margin-top:6px}
+.home-hero .hi{font-size:.9em;opacity:.85}
+.home-hero h1{margin:4px 0 0;color:inherit;font-size:1.5em}
+.helper{display:flex;gap:10px;align-items:center;border:1px dashed var(--line-strong);border-radius:16px;padding:12px 14px;font-size:.88em;color:var(--ink-2);background:transparent;width:100%;text-align:left}
+.helper .ic{font-size:1.4em}
+.mini{display:flex;justify-content:space-between;align-items:center;background:var(--yellow-soft);color:var(--yellow-ink);border-radius:18px;padding:14px 16px;border:0;width:100%;text-align:left;font-weight:700;font-size:.95em}
+.mini .st{font-size:.8em;font-weight:500;opacity:.85;display:block}
+.step-in{animation:in .22s ease-out}
+@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="stage">
+  <div class="spacer"></div>
+  <div class="phone">
+    <div class="status"><b id="clock">9:41</b><span>맡김 · 시연용 프로토타입</span><span>●●●</span></div>
+    <div class="screen" id="screen"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+  <aside class="side">
+    <div class="brand"><span class="appicon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" > <defs><clipPath id="rr"><rect width="1024" height="1024" rx="226"/></clipPath></defs> <g clip-path="url(#rr)"> <rect width="1024" height="1024" fill="#F4E9D2"/> <!-- bundle body --> <path d="M512 330 C 700 330, 860 460, 860 640 C 860 800, 720 900, 512 900 C 304 900, 164 800, 164 640 C 164 460, 324 330, 512 330 Z" fill="#1F6F4E"/> <!-- knot ears --> <path d="M512 340 C 430 250, 300 200, 250 260 C 210 310, 300 380, 440 380 Z" fill="#E9A93B"/> <path d="M512 340 C 594 250, 724 200, 774 260 C 814 310, 724 380, 584 380 Z" fill="#E9A93B"/> <ellipse cx="512" cy="356" rx="72" ry="58" fill="#D6912A"/> <!-- check --> <path d="M380 630 L 480 730 L 660 530" fill="none" stroke="#F4E9D2" stroke-width="82" stroke-linecap="round" stroke-linejoin="round"/> </g> </svg></span><span><span class="mark">맡김</span><br><span class="tag">사장님 광고, 맡기기만 하세요</span></span></div>
+    <div class="panel">
+      <h4>지금 화면</h4>
+      <p class="now" id="side-now">홈</p>
+      <p id="side-desc">사장님이 처음 만나는 화면. 할 일은 두 가지뿐.</p>
+    </div>
+    <div class="panel">
+      <h4>이 흐름이 대신하는 거래 단계</h4>
+      <ul class="chain" id="chain"></ul>
+    </div>
+    <div class="panel">
+      <h4>시연 바로가기</h4>
+      <div class="jump" id="jump"></div>
+    </div>
+    <p class="note">크리에이터 4개 계정의 팔로워·게시물·릴스 조회수는 공개 프로필 캡처(9/5) 기준이며, 견적·소요일·광고 결과 수치는 시연용 예시입니다.</p>
+  </aside>
+  <div class="spacer"></div>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+/* 업종별로 손님·자랑거리·목표 선택지가 달라진다 */
+const BY_BIZ = {
+  '음식점':{
+    who:[['🏘️','동네 주민'],['💼','근처 직장인'],['🧑‍🎓','대학생·젊은 손님'],['🧳','관광객·외지 손님'],['👨‍👩‍👧','가족 단위'],['🤷','잘 모르겠어요']],
+    pride:[['👍','맛·품질'],['💰','착한 가격'],['🕰️','오래된 역사'],['🪴','분위기·인테리어'],['😊','친절·정'],['📍','좋은 위치']],
+    goal:[['🚶','새 손님이 찾아오게'],['🔁','단골이 다시 오게'],['🆕','새 메뉴 알리기'],['🛵','배달 주문 늘리기']]},
+  '카페·빵집':{
+    who:[['🧑‍🎓','대학생'],['💼','근처 직장인'],['🏘️','동네 주민'],['💑','데이트·친구 모임'],['🧳','관광객·외지 손님'],['🤷','잘 모르겠어요']],
+    pride:[['☕','커피·디저트 맛'],['💰','착한 가격'],['🪴','분위기·인테리어'],['📸','사진 찍기 좋은 공간'],['💻','공부·작업하기 좋은 자리'],['😊','친절·정']],
+    goal:[['🚶','새 손님이 찾아오게'],['🔁','단골이 다시 오게'],['🆕','새 메뉴·시즌 메뉴 알리기'],['🎂','단체·케이크 주문 늘리기']]},
+  '미용·뷰티':{
+    who:[['👩','20~30대 여성'],['🧑‍🎓','대학생'],['🏘️','동네 주민'],['💼','직장인'],['👨','남성 손님'],['🤷','잘 모르겠어요']],
+    pride:[['✂️','원장님 실력·경력'],['💰','착한 가격'],['🪴','분위기·인테리어'],['💬','꼼꼼한 상담'],['📅','예약이 편해요'],['📍','좋은 위치']],
+    goal:[['🚶','새 손님이 찾아오게'],['🔁','재방문 늘리기'],['🆕','새 시술·메뉴 알리기'],['📅','예약 문의 늘리기']]},
+  '마트·소매':{
+    who:[['🏘️','동네 주민'],['🧑‍🎓','자취생·1인 가구'],['👨‍👩‍👧','가족 단위'],['💼','직장인'],['🤷','잘 모르겠어요']],
+    pride:[['🥬','신선함·품질'],['💰','착한 가격'],['🧺','품목이 다양해요'],['🌙','늦게까지 열어요'],['🛵','배달·주문 가능'],['😊','친절·정']],
+    goal:[['🚶','새 손님이 찾아오게'],['🔁','단골이 다시 오게'],['🏷️','할인·행사 알리기'],['🛵','배달 주문 늘리기']]},
+  '학원·교육':{
+    who:[['🎒','초·중학생'],['📖','고등학생'],['🧑‍🎓','대학생·취업 준비생'],['💼','직장인 (자격증·취미)'],['👩‍👧','학부모가 정해요'],['🤷','잘 모르겠어요']],
+    pride:[['👩‍🏫','선생님 실력·경력'],['💰','착한 수강료'],['🏅','성적·합격 실적'],['👥','소규모·1:1 관리'],['🏫','시설·자습실'],['📍','좋은 위치']],
+    goal:[['🚶','새 수강생 모으기'],['🔁','재등록 늘리기'],['🆕','새 강좌 알리기'],['📞','상담 문의 늘리기']]},
+  '기타 서비스':{
+    who:[['🏘️','동네 주민'],['💼','직장인'],['🧑‍🎓','대학생·자취생'],['👨‍👩‍👧','가족 단위'],['🏪','사업자·가게'],['🤷','잘 모르겠어요']],
+    pride:[['🛠️','실력·경력'],['💰','착한 가격'],['⚡','빠른 처리'],['🤝','꼼꼼함·믿음'],['🚗','출장·방문 가능'],['📍','좋은 위치']],
+    goal:[['🚶','새 손님이 찾아오게'],['🔁','재이용 늘리기'],['🆕','새 서비스 알리기'],['📞','문의 전화 늘리기']]},
+};
+const bizOf = a => BY_BIZ[a.biz] || BY_BIZ['기타 서비스'];
+const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" > <defs><clipPath id="rr"><rect width="1024" height="1024" rx="226"/></clipPath></defs> <g clip-path="url(#rr)"> <rect width="1024" height="1024" fill="#F4E9D2"/> <!-- bundle body --> <path d="M512 330 C 700 330, 860 460, 860 640 C 860 800, 720 900, 512 900 C 304 900, 164 800, 164 640 C 164 460, 324 330, 512 330 Z" fill="#1F6F4E"/> <!-- knot ears --> <path d="M512 340 C 430 250, 300 200, 250 260 C 210 310, 300 380, 440 380 Z" fill="#E9A93B"/> <path d="M512 340 C 594 250, 724 200, 774 260 C 814 310, 724 380, 584 380 Z" fill="#E9A93B"/> <ellipse cx="512" cy="356" rx="72" ry="58" fill="#D6912A"/> <!-- check --> <path d="M380 630 L 480 730 L 660 530" fill="none" stroke="#F4E9D2" stroke-width="82" stroke-linecap="round" stroke-linejoin="round"/> </g> </svg>`;
+/* 주소 → 웹 검색 결과 (시연용 가상 가게. 실제 서비스에서는 네이버 플레이스·카카오맵·블로그를 검색해 채운다) */
+const SHOPS = {
+  '카페·빵집':{name:'카페 온기', addr:'서울 서대문구 이화여대길 52-3, 1층', src:'네이버 플레이스 · 카카오맵 · 블로그 14건', hours:'09:00–22:00 · 일요일 휴무', rating:4.6, reviews:128,
+    photos:[['창가 자리','#7a8f6e'],['크로플','#c98a3a'],['라떼 아트','#8a6a4a'],['매장 전경','#6b7d8a'],['흑임자라떼','#4a4a4a'],['디저트 쇼케이스','#b07a5a']],
+    keywords:[['조용해서 공부하기 좋아요',41],['콘센트가 많아요',33],['크로플이 맛있어요',29],['사장님이 친절해요',24],['가격이 착해요',18]],
+    quotes:['시험기간에 4시간 앉아 있었는데 눈치 안 주셔서 좋았어요','크로플 위에 아이스크림 올려주는 거 진짜 맛있음','이대 후문 쪽에서 제일 조용한 카페'],
+    menu:[['아메리카노',3500],['흑임자라떼',5000],['크로플',5500],['말차라떼',5000],['에그샌드위치',6500]],
+    signature:'크로플 + 흑임자라떼', vibe:'우드톤, 큰 창, 조용한 분위기', best:'화·수 저녁 8–10시 (시험기간 2주 전)'},
+  '음식점':{name:'할매 손칼국수', addr:'서울 서대문구 이화여대2길 18', src:'네이버 플레이스 · 카카오맵 · 블로그 9건', hours:'11:00–21:00 · 일요일 휴무', rating:4.5, reviews:212,
+    photos:[['칼국수','#c9a04a'],['보쌈','#a86a4a'],['겉절이','#b8503a'],['매장 내부','#7a6a5a'],['반찬','#6a8a5a'],['면 뽑는 모습','#8a8a7a']],
+    keywords:[['양이 많아요',58],['국물이 진해요',44],['가성비가 좋아요',37],['겉절이가 맛있어요',25],['오래된 집이에요',19]],
+    quotes:['30년 됐다는데 국물이 진짜 진함','8천원에 이 양이면 대학생한테 최고','겉절이 리필 눈치 안 봐도 됨'],
+    menu:[['손칼국수',8000],['보쌈(중)',22000],['만두',5000],['콩국수(여름)',9000]],
+    signature:'손칼국수 + 겉절이', vibe:'오래된 동네 식당, 직접 뽑는 면', best:'평일 오전 11시 (점심 손님 몰리기 전)'},
+  '미용·뷰티':{name:'헤어 온', addr:'서울 서대문구 이화여대길 40, 2층', src:'네이버 플레이스 · 카카오맵 · 블로그 6건', hours:'10:00–20:00 · 월요일 휴무', rating:4.8, reviews:94,
+    photos:[['염색 전후','#8a5a7a'],['매장 내부','#7a7a8a'],['커트 결과','#5a5a5a'],['상담 공간','#a89a7a'],['펌 결과','#6a5a4a'],['입구','#9a8a7a']],
+    keywords:[['상담이 꼼꼼해요',38],['염색이 잘 나와요',31],['예약이 편해요',22],['원장님이 친절해요',20],['가격이 합리적이에요',15]],
+    quotes:['원하는 톤 사진 보여드리니까 딱 그대로 나옴','학생 할인 있어서 좋았어요','처음 온 미용실인데 머릿결 상태부터 봐주심'],
+    menu:[['여성 커트',18000],['염색',65000],['펌',90000],['클리닉',40000]],
+    signature:'염색 (학생 할인)', vibe:'밝은 조명, 1:1 상담', best:'개강 2주 전 주말'},
+  '학원·교육':{name:'이룸 수학학원', addr:'서울 서대문구 신촌로 120, 3층', src:'네이버 플레이스 · 카카오맵 · 맘카페 글 5건', hours:'14:00–22:00 · 일요일 휴무', rating:4.7, reviews:61,
+    photos:[['강의실','#5a6a8a'],['자습실','#7a8a9a'],['선생님 판서','#4a5a6a'],['학원 입구','#8a8a8a'],['교재','#9a8a6a'],['상담실','#7a7a6a']],
+    keywords:[['선생님이 꼼꼼해요',27],['소수 정예예요',22],['성적이 올랐어요',19],['자습실이 좋아요',14],['상담을 자주 해줘요',12]],
+    quotes:['모르는 문제 끝까지 붙잡고 알려주심','한 반에 6명이라 질문 편함','내신 2등급 → 1등급 올랐어요'],
+    menu:[['고1 수학 (주 2회)',240000],['고2 수학 (주 2회)',260000],['중3 예비고 특강',180000]],
+    signature:'6인 소수 정예 + 매주 상담', vibe:'조용한 자습실, 판서 위주 수업', best:'중간고사 4주 전 평일 저녁'},
+  '마트·소매':{name:'이대 마을마트', addr:'서울 서대문구 대현동 37-1', src:'네이버 플레이스 · 카카오맵', hours:'08:00–24:00 · 연중무휴', rating:4.3, reviews:76,
+    photos:[['과일 코너','#c96a3a'],['매장 입구','#6a7a8a'],['반찬 코너','#8a6a4a'],['할인 안내','#c9a04a'],['계산대','#7a7a7a'],['채소','#5a8a5a']],
+    keywords:[['늦게까지 해요',29],['가격이 싸요',26],['과일이 신선해요',18],['배달해 줘요',12],['사장님이 친절해요',11]],
+    quotes:['자취생한테 소포장 반찬 진짜 유용함','편의점보다 싸고 밤 12시까지 함','2만원 넘으면 배달해 주심'],
+    menu:[['소포장 반찬',3000],['과일 소포장',4000],['배달 (2만원 이상)',0]],
+    signature:'소포장 반찬 + 심야 영업', vibe:'동네 마트, 자취생 단골', best:'개강 첫 주 저녁'},
+  '기타 서비스':{name:'이대 옷수선', addr:'서울 서대문구 이화여대길 29, 지하 1층', src:'네이버 플레이스 · 카카오맵 · 블로그 3건', hours:'10:00–19:00 · 일요일 휴무', rating:4.9, reviews:48,
+    photos:[['수선 전후','#5a5a7a'],['작업대','#8a7a6a'],['재봉틀','#4a4a4a'],['입구','#7a8a7a'],['원단','#9a7a8a'],['가격표','#c9a04a']],
+    keywords:[['빠르게 해줘요',24],['꼼꼼해요',20],['가격이 저렴해요',15],['당일 수선 돼요',10],['친절해요',9]],
+    quotes:['바지 기장 30분 만에 해주심','명품 수선 맡겼는데 티 하나 안 남','가격표 붙어 있어서 안심'],
+    menu:[['바지 기장',5000],['허리 줄임',12000],['지퍼 교체',8000]],
+    signature:'당일 수선 + 가격표 공개', vibe:'작은 작업실, 오래된 재봉틀', best:'환절기 시작 주말'},
+};
+const shopOf = a => SHOPS[a.biz] || SHOPS['기타 서비스'];
+const TREND_NOTE = {
+  '대학생':'요즘 대학생 시청자는 말 없는 15초 영상 + 큰 자막 + "자리·콘센트·가격" 정보를 제일 잘 봐요. 첫 1초에 결과물(음식·공간)부터 보여주는 형식이 반응이 좋아요.',
+  '직장인':'직장인은 점심·퇴근길에 소리 끄고 봐요. 자막만으로 이해되게, 가격과 위치를 마지막 3초에 고정해 주세요.',
+  '동네':'동네 손님은 "여기 어디야?"가 첫 반응이에요. 지하철역·랜드마크 기준 위치 자막, 사장님 얼굴이 나오는 인사 컷이 신뢰를 줘요.',
+  '학부모':'학부모는 정보형 영상을 끝까지 봐요. 선생님이 직접 한 문제 풀어주는 30초, 반 인원·상담 주기 같은 숫자를 자막으로.',
+  '관광':'외지 손님은 저장(북마크)을 해요. "이대 오면 여기" 형식의 위치 훅과 영업시간 자막을 넣어 주세요.',
+};
+const trendNoteFor = a => { const w=a.who||''; for(const k of Object.keys(TREND_NOTE)) if(w.includes(k)) return TREND_NOTE[k]; if((w.includes('학생'))) return TREND_NOTE['학부모']; return TREND_NOTE['동네']; };
+const Q = [
+  {id:'biz', title:'어떤 가게를 하세요?', lead:'하나만 골라 주세요.', opts:[
+    ['🍲','음식점'],['☕','카페·빵집'],['💇','미용·뷰티'],['🛒','마트·소매'],['📚','학원·교육'],['🧰','기타 서비스']]},
+  {id:'addr', type:'addr', title:'가게 주소를 알려 주세요', lead:'주소만 있으면 사진·리뷰·메뉴는 저희가 찾아볼게요.'},
+  {id:'who', title:a=>a.biz==='학원·교육'?'누가 주로 다니세요?':'손님은 주로 어떤 분들이세요?', lead:'제일 많이 오시는 분들로요.', opts:a=>bizOf(a).who},
+  {id:'pride', title:a=>a.biz==='학원·교육'?'우리 학원 자랑거리는요?':'우리 가게 자랑거리는요?', lead:'여러 개 골라도 돼요.', multi:true, opts:a=>bizOf(a).pride},
+  {id:'goal', title:'광고로 뭘 바라세요?', lead:'제일 급한 것 하나요.', opts:a=>bizOf(a).goal},
+  {id:'budget', title:'이번에 쓸 수 있는 돈은요?', lead:'광고 한 번 기준이에요. 결과 보고 다음을 정하면 돼요.', opts:[
+    ['','10만원 안쪽'],['','10만 ~ 30만원'],['','30만 ~ 50만원'],['','50만원 넘게도 괜찮아요']]},
+  {id:'photo', title:'가게 사진이나 영상이 있으세요?', lead:'없어도 괜찮아요. 찍어 주는 분을 찾아 드릴게요.', opts:[
+    ['📷','찍어 둔 게 있어요'],['🙅','없어요, 와서 찍어 주세요']]},
+];
+
+const MEDIA = {
+  reels:{ic:'📱',name:'인스타 릴스',short:'짧은 영상',desc:'젊은 손님·동네 손님에게 짧은 영상으로'},
+  shorts:{ic:'▶️',name:'유튜브 쇼츠',short:'짧은 영상',desc:'멀리서도 찾아오는 손님에게'},
+  blog:{ic:'📝',name:'네이버 블로그',short:'글·사진 후기',desc:'"○○동 맛집" 검색하는 손님에게'},
+  local:{ic:'🏘️',name:'동네 인플루언서',short:'우리 동네 소식 계정',desc:'동네 주민에게 바로 알려요'},
+};
+
+/* 크리에이터 데이터: 인스타그램 공개 프로필에서 자동 수집한 항목(팔로워·게시물·최근 릴스 조회수)을 기준으로 맡김이 견적을 산정한다.
+   아래 4개 계정은 실제 공개 프로필 화면(2026-09-05 캡처)의 수치를 그대로 옮긴 것. 견적·소요일은 맡김의 산정 예시. */
+const REAL = {
+  nyol:{ id:'nyol', h:'withnyol', n:'뇰', area:'서울 · 자취·혼놀 일상', followers:3462, posts:37, following:21, color:'#c26a8a', badge:'개인 크리에이터',
+    type:'자취생·백수 일상 브이로그 릴스', bio:'뇰과 함께 🍥',
+    reels:[['PMS은 백수girl은 얼마나 먹을까?',429000],['불닭냉면 더 맛있게 먹는 방법',194000],['백수는 과연 인생 역전 할 수 있을까? 경마장편',167000],['여름 다가온다, 부산 해수욕장 준비',149000],['거지 백수의 주식 올라서 폭식 한강데이트',65000],['백수의 은밀한 취미, 백수일상',49000],['거지 백수의 을지로 혼놀코스',29000],['나, 백수 거지 갑자기 크리에이터가 되다!?',25000]],
+    fit:['카페·빵집','음식점','마트·소매','기타 서비스'], why:'팔로워는 적지만 릴스 한 편이 팔로워의 30~100배까지 퍼지는 계정이에요. 자취생·대학생 손님이 주 시청자라 이대 앞 가게와 잘 맞고, 개인이라 견적이 가장 낮아요.',
+    pkg:'가게 방문 혼놀 릴스 1편 + 게시 2주', price:80000, days:7 },
+  onfleek:{ id:'onfleek', h:'on_fleekkk', n:'온플릭', area:'서울 · 패션 매장 방문', followers:56000, posts:768, following:425, color:'#1d1d1f', badge:'패션 큐레이터',
+    type:'매장 방문·착장 소개 릴스 (무신사 큐레이터)', bio:'감성과 실용 사이, 취향 가득 패션 공간',
+    reels:[['유니클로 크롭티 소개할게요',74000],['역대급 할인 행사, 탑텐의 텐텐데이',24000],['올가을 가장 먼저 찾을 디앤드퀘스천',14000]],
+    fit:['미용·뷰티','기타 서비스','카페·빵집'], why:'매장을 직접 찾아가 소개하는 형식이라 옷·미용·공간처럼 "가서 보는" 가게에 맞아요. 20대 남성 시청자 비중이 높아요.',
+    pkg:'매장 방문 릴스 1편 + 게시 2주 + 스토리 1회', price:250000, days:10 },
+  bbang:{ id:'bbang', h:'bbang.morning', n:'빵모닝', area:'전국 · 빵·카페 큐레이션', followers:198000, posts:1558, following:3, color:'#e8562a', badge:'인증 계정',
+    type:'빵집·카페 큐레이션 (자체 앱 운영)', bio:'빵 좋아하면 팔로 팔로 팔로미',
+    reels:[['[속보] 한정선 찹쌀떡 전국 GS25에 떴다',null],['도쿄에서 꼭 먹어야 할 1티어 팬케이크',null],['빵에 미친 앱 출시, 빵켓팅 소식부터 내 주변 맛집까지',null]],
+    fit:['카페·빵집'], why:'빵·디저트만 다루는 계정이라 시청자가 곧 손님이에요. 팔로워가 많아 견적은 높지만 카페·빵집이면 가장 정확하게 닿아요.',
+    pkg:'신메뉴·시그니처 소개 게시물 1건 + 릴스 1편 + 앱 내 가게 등록', price:450000, days:14 },
+  seoul:{ id:'seoul', h:'seoul__guide', n:'서울가이드', area:'서울 전역 · 동네·데이트 코스', followers:223000, posts:2614, following:115, color:'#2b2b2b', badge:'지역 정보 계정',
+    type:'서울 동네별 데이트 코스·행사 정보', bio:'All Live Info. In Seoul',
+    reels:[['나랑 안국에 데이트 하러 갈래..?',null],['나랑 혜화에 데이트 하러 갈래..?',null],['시간이 지나도 변하지 않는 곳, 올림픽공원',null],['저녁에 지하철을 타야하는 이유 (합정)',null]],
+    fit:['카페·빵집','음식점','미용·뷰티','기타 서비스','학원·교육','마트·소매'], why:'"○○동 데이트 코스" 형식으로 동네를 통째로 소개해요. 이대·신촌 코스 안에 가게가 들어가면 외지 손님과 데이트 손님이 같이 늘어요.',
+    pkg:'"이대·신촌 코스" 게시물에 가게 포함 + 스토리 2회', price:380000, days:12 },
+};
+const CREATORS = {
+  reels:[REAL.nyol, REAL.onfleek, REAL.bbang, REAL.seoul],
+  local:[REAL.seoul, REAL.nyol],
+  blog:[
+    {n:'서연',h:'예시 계정',area:'서대문·마포',followers:null,posts:null,f:'월 방문 6만',badge:'예시',type:'신촌·이대 동네 블로그 9년',color:'#8a5cb0',reels:[],fit:[],why:'"이대 카페"처럼 동네+업종 검색에 잡히는 글을 써요.',pkg:'방문 취재 + 블로그 글 1편(사진 20장) + 상위 노출 관리 4주',price:180000,days:10},
+    {n:'태현',h:'예시 계정',area:'수도권',followers:null,posts:null,f:'월 방문 15만',badge:'예시',type:'학원·교육 정보 블로그',color:'#2f8a7a',reels:[],fit:[],why:'학부모가 학원 고를 때 읽는 글을 써요.',pkg:'블로그 글 1편 + 지도 리뷰 등록 대행',price:260000,days:12},
+  ],
+  shorts:[
+    {n:'도윤',h:'예시 계정',area:'전국',followers:null,posts:null,f:'구독자 12만',badge:'예시',type:'서울 골목 카페·숨은 가게',color:'#b06a2f',reels:[],fit:[],why:'외지에서 일부러 찾아오는 손님을 만들어요.',pkg:'쇼츠 1편 + 채널 게시 + 댓글 안내 관리',price:480000,days:18},
+  ],
+};
+const fmtN = n => n==null?'—': n>=10000 ? (Math.round(n/1000)/10).toLocaleString('ko-KR')+'만' : n.toLocaleString('ko-KR');
+const avgViews = c => { const v=c.reels.map(r=>r[1]).filter(Boolean); return v.length? Math.round(v.reduce((a,b)=>a+b,0)/v.length) : null; };
+
+const TRENDS = [
+  {k:'인사형',biz:['음식점','카페·빵집','미용·뷰티','학원·교육','기타 서비스'],t:'사장님이 직접 나와 인사하는 영상',d:'얼굴이 보이면 믿음이 생겨요. 50대 이상 사장님 영상이 오히려 더 잘 봐요.',g:'linear-gradient(140deg,#6b3f2a,#2b4a3c)'},
+  {k:'과정형',biz:['음식점','카페·빵집'],t:'커피 내리고 빵 굽는 과정을 위에서 찍은 영상',d:'손만 보여줘도 충분해요. 말 안 해도 돼요.',g:'linear-gradient(140deg,#8a4b2b,#c98a3a)'},
+  {k:'후기형',biz:['음식점','카페·빵집','미용·뷰티','학원·교육','기타 서비스'],t:'손님이 한 마디 해주는 영상',d:'"여기서 성적 올랐어요", "3년째 다녀요" 한 마디가 광고 문구보다 세요.',g:'linear-gradient(140deg,#2c4f7c,#5b8ab5)'},
+  {k:'가격형',biz:['음식점','카페·빵집','마트·소매','미용·뷰티'],t:'가격표를 그대로 보여주는 영상',d:'"이 가격 맞아요?" 하고 찾아오게 하는 방식. 착한 가격이 자랑이면 이거예요.',g:'linear-gradient(140deg,#8f7a1e,#d4b23a)'},
+  {k:'공간형',biz:['카페·빵집','미용·뷰티','학원·교육'],t:'자리·공간을 천천히 보여주는 영상',d:'콘센트 자리, 조용한 구석, 자습실. 학생들은 "앉을 곳"을 보고 정해요.',g:'linear-gradient(140deg,#3f5a6b,#8fb0c2)'},
+  {k:'강의형',biz:['학원·교육'],t:'선생님이 1분 만에 문제 하나 풀어주는 영상',d:'실력은 말로 하는 것보다 한 문제 풀어 보이는 게 빨라요.',g:'linear-gradient(140deg,#2f4a6b,#6a8fb5)'},
+  {k:'산책형',biz:['음식점','카페·빵집','마트·소매','기타 서비스'],t:'이대 앞 골목 산책 영상에 우리 가게가 나오기',d:'광고 티 안 나게 동네 소개하면서 가게를 들러요.',g:'linear-gradient(140deg,#2f5f4a,#7aa88b)'},
+  {k:'전후형',biz:['미용·뷰티','기타 서비스'],t:'하기 전·하고 난 뒤 비교 영상',d:'미용실·네일·수선처럼 결과가 눈에 보이는 가게에 딱이에요.',g:'linear-gradient(140deg,#5a3a6b,#a07ab5)'},
+];
+
+/* ---------------- state ---------------- */
+const S = {
+  screen:'home', qi:0, ans:{}, likes:new Set(), media:null, creator:null, pay:null,
+  stage:0, review:null, big:false, shop:null, lookup:'idle', ordered:false, helper:false, trendFilter:'전체', history:[]
+};
+
+const CHAIN = ['찾기','고르기','협상·계약','설명(브리핑)','제작·검수','결제','결과 확인','다시 맡기기'];
+const SIDE = {
+  home:      {t:'홈', d:'사장님이 처음 만나는 화면. 할 일은 두 가지뿐. 글자 크게·자녀 대신하기·전화 접수까지 여기서.', chain:[]},
+  q:         {t:'프로토콜 질문', d:'한 화면에 질문 하나, 답은 누르기만. 주소를 넣으면 AI가 가게를 검색해 사진·리뷰·메뉴를 모아 오고, 이 답들이 그대로 브리핑이 됩니다.', chain:[0]},
+  result:    {t:'추천 결과', d:'"왜 이 광고가 맞는지"를 사장님 말로 설명. AI 채팅과 다른 점은 이 다음 화면부터입니다.', chain:[0]},
+  creators:  {t:'크리에이터 고르기', d:'고정 패키지·고정 가격. 흥정 없이 고르기만. 팔로워·게시물·릴스 조회수는 인스타그램 공개 프로필에서 자동 수집해 견적을 산정.', chain:[0,1]},
+  confirm:   {t:'확인·결제', d:'돈은 맡김이 보관(에스크로). 자녀가 대신 결제하는 길도 열어둠.', chain:[0,1,2,5]},
+  brief:     {t:'AI 브리핑', d:'사장님 답 + 주소로 검색한 사진·리뷰·메뉴 + 요즘 릴스 흐름을 합쳐 콘티까지 써 줌. 사장님은 설명할 게 없고, 크리에이터는 물어볼 게 없음.', chain:[0,1,2,3,5]},
+  progress:  {t:'진행 현황', d:'사장님이 할 일은 "네/아니요" 한 번. 나머지는 맡김이 카톡으로 알려줌.', chain:[0,1,2,3,4,5]},
+  review:    {t:'영상 확인', d:'검수도 프로토콜. 고칠 이유를 고르면 크리에이터에게 그대로 전달.', chain:[0,1,2,3,4,5]},
+  result2:   {t:'광고 결과', d:'조회수 그래프 대신 문장. 그리고 "같은 분께 또" 버튼 하나로 재의뢰.', chain:[0,1,2,3,4,5,6,7]},
+  trends:    {t:'요즘 광고 구경', d:'부가 기능. 마음에 드는 걸 찜하면 추천 결과에 반영됨. 사장님이 안목을 기르는 단계.', chain:[]},
+};
+
+/* ---------------- helpers ---------------- */
+const $ = s=>document.querySelector(s);
+const won = n=>n.toLocaleString('ko-KR')+'원';
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800)}
+function go(sc,push=true){ if(push && S.screen!==sc) S.history.push(S.screen); S.screen=sc; render(); }
+function back(){ const p=S.history.pop(); if(p) {S.screen=p; render();} else go('home',false); }
+function set(k,v){S[k]=v;render()}
+
+function recommend(){
+  const a=S.ans; const sc={reels:1,blog:1,shorts:0,local:0}; const why={reels:[],blog:[],shorts:[],local:[]};
+  const who=a.who||'', biz=a.biz, goal=a.goal||'', budget=a.budget||'', pride=(a.pride||[]).join(' ');
+  const has=(s,k)=>s.includes(k);
+  /* 손님 */
+  if(has(who,'동네')){sc.local+=3;sc.blog+=1;why.local.push('동네 주민이 주 손님이라');why.blog.push('"우리 동네 + 가게" 검색에 잡혀요')}
+  if(has(who,'직장인')){sc.reels+=2;sc.blog+=2;why.reels.push('출퇴근·점심시간에 휴대폰으로 보는 직장인에게');why.blog.push('"근처 ○○" 검색하는 직장인에게')}
+  if(has(who,'대학생')||has(who,'자취생')||has(who,'20~30대')||has(who,'데이트')){sc.reels+=3;sc.shorts+=1;why.reels.push('젊은 손님은 릴스로 가게를 찾아요')}
+  if(has(who,'고등학생')||has(who,'초·중학생')||has(who,'학부모')){sc.blog+=3;sc.local+=1;why.blog.push('학부모는 블로그 후기를 꼼꼼히 읽고 정해요')}
+  if(has(who,'취업')){sc.blog+=1;sc.shorts+=1;why.shorts.push('시험·취업 정보는 유튜브에서 많이 찾아요')}
+  if(has(who,'관광객')){sc.shorts+=3;sc.blog+=2;why.shorts.push('멀리서 검색해 찾아오는 손님에게');why.blog.push('여행 전에 블로그를 많이 찾아봐요')}
+  if(has(who,'가족')){sc.blog+=3;why.blog.push('가족은 블로그 후기를 보고 정해요')}
+  if(has(who,'남성')){sc.shorts+=1;sc.reels+=1}
+  if(has(who,'사업자')){sc.blog+=2;why.blog.push('업체 찾을 땐 검색부터 해요')}
+  if(has(who,'모르겠')){sc.local+=2;sc.blog+=1;why.local.push('우선 동네에 알리는 게 안전해요')}
+  /* 업종 */
+  if(biz==='음식점'||biz==='카페·빵집'){sc.reels+=1;sc.blog+=1;why.reels.push('먹는 건 영상으로 보여줄 때 힘이 세요')}
+  if(biz==='미용·뷰티'){sc.reels+=2;why.reels.push('전·후 비교 영상이 잘 맞아요')}
+  if(biz==='학원·교육'){sc.blog+=2;sc.local+=1;why.blog.push('학원은 글로 꼼꼼히 비교하고 정해요')}
+  if(biz==='마트·소매'){sc.local+=2;why.local.push('할인·행사 소식은 동네 계정이 빨라요')}
+  if(biz==='기타 서비스'){sc.blog+=2;why.blog.push('서비스 업체는 검색으로 찾는 경우가 많아요')}
+  /* 목표 */
+  if(has(goal,'단골')||has(goal,'재등록')||has(goal,'재방문')||has(goal,'재이용')){sc.local+=2;why.local.push('이미 아는 손님에게 다시 알리기 좋아요')}
+  if(has(goal,'배달')){sc.reels+=1;sc.blog+=1}
+  if(has(goal,'알리기')){sc.reels+=1;sc.local+=1}
+  if(has(goal,'문의')||has(goal,'상담')||has(goal,'예약')){sc.blog+=2;why.blog.push('문의는 검색해서 들어온 분이 제일 많이 해요')}
+  if(has(goal,'단체')){sc.blog+=1;sc.local+=1}
+  /* 예산 */
+  if(budget.startsWith('10만원')){sc.local+=2;sc.shorts-=3;why.local.push('10만원 안쪽으로도 가능해요')}
+  if(budget.startsWith('10만 ~')){sc.shorts-=2}
+  /* 자랑거리 */
+  if(has(pride,'역사')){sc.shorts+=1;sc.blog+=1;why.shorts.push('오래된 가게 이야기는 멀리까지 퍼져요')}
+  if(has(pride,'가격')||has(pride,'수강료')){sc.reels+=1;sc.local+=1}
+  if(has(pride,'분위기')||has(pride,'사진')||has(pride,'공간')){sc.reels+=2;why.reels.push('공간과 분위기는 영상이 제일 잘 보여줘요')}
+  if(has(pride,'실력')||has(pride,'실적')||has(pride,'경력')){sc.blog+=2;why.blog.push('실력·실적은 글로 자세히 써야 믿어요')}
+  if(has(pride,'공부')||has(pride,'자습실')){sc.reels+=1;sc.blog+=1;why.reels.push('"공부하기 좋은 자리"는 학생들 사이에서 영상으로 퍼져요')}
+  if(has(pride,'1:1')||has(pride,'상담')||has(pride,'꼼꼼')){sc.blog+=1}
+  if(has(pride,'배달')||has(pride,'출장')||has(pride,'늦게')){sc.local+=1}
+  const sk=(S.shop?S.shop.keywords.map(k=>k[0]).join(' '):'');
+  if(sk.includes('조용')||sk.includes('콘센트')||sk.includes('자습실')){sc.reels+=1;why.reels.push('리뷰에 자리·공간 얘기가 많아서 영상으로 보여주면 좋아요')}
+  if(sk.includes('가성비')||sk.includes('싸요')||sk.includes('착해요')){sc.local+=1}
+  if(S.likes.size){ [...S.likes].forEach(k=>{ if(['산책형','인사형','과정형','공간형','전후형'].includes(k)) sc.reels+=1; if(k==='후기형'||k==='강의형') sc.blog+=1; }); }
+  return Object.keys(sc).map(k=>({k,score:sc[k],why:why[k][0]||MEDIA[k].desc})).sort((a,b)=>b.score-a.score);
+}
+
+function briefText(){
+  const a=S.ans, c=S.creator||{}, m=MEDIA[S.media]||{};
+  const pride=(a.pride||[]).join(', ')||'-';
+  return {
+    biz:a.biz||'가게', who:a.who||'동네 손님', pride:pride==='-'?'(답변 없음)':pride, goal:a.goal||'새 손님이 찾아오게', photo:a.photo, m:m.name, pkg:c.pkg,
+    likes:[...S.likes]
+  };
+}
+
+/* ---------------- screens ---------------- */
+function topbar(title, showBack=true){
+  return `<div class="top">
+    ${showBack?`<button class="back" onclick="back()" aria-label="뒤로">‹</button>`:''}
+    <span class="ttl">${title||''}</span>
+    <button class="a11y ${S.big?'on':''}" onclick="S.big=!S.big;render()">가<span style="font-size:1.25em">가</span> 글자 ${S.big?'보통':'크게'}</button>
+  </div>`;
+}
+
+function homeScreen(){
+  return `${topbar('<span class="row" style="gap:10px"><span class="logo-sm">'+ICON+'</span><span class="wordmark">맡김</span></span>',false)}
+  <div class="home-hero">
+    <div class="hi">${S.helper?'대신 도와드리는 분 모드':'이대 앞 ○○카페 사장님'}</div>
+    <h1>안녕하세요.<br>광고는 저희에게 맡기세요.</h1>
+  </div>
+  <div class="stack" style="margin-top:16px">
+    ${S.ordered?`<button class="mini" onclick="go('progress')"><span>진행 중인 광고 1건<span class="st">${STAGES[S.stage].t} · 눌러서 확인</span></span><span>›</span></button>`:''}
+    <button class="btn primary" style="min-height:92px" onclick="startQ()">광고 맡기기<span class="sub">질문 7개에 답만 하시면 돼요 · 3분</span></button>
+    <button class="btn secondary" style="min-height:76px" onclick="go('trends')">요즘 광고 구경하기<span class="sub">다른 가게들은 어떻게 하나 보기</span></button>
+  </div>
+  <div class="grow"></div>
+  <div class="stack" style="gap:8px;margin-top:20px">
+    <button class="helper" onclick="S.helper=!S.helper;render();toast(S.helper?'자녀·직원이 대신 진행하는 모드예요':'사장님 본인 모드로 돌아왔어요')"><span class="ic">👨‍👩‍👧</span><span><b>자녀·직원이 대신 해드리기</b><br><span class="small">사장님 대신 눌러 드릴 수 있어요 ${S.helper?'· 켜짐':''}</span></span></button>
+    <button class="helper" onclick="toast('전화 접수 화면은 시연 범위 밖이에요')"><span class="ic">📞</span><span><b>전화로 신청하기</b><br><span class="small">앱이 어려우면 상담원이 대신 물어봐 드려요</span></span></button>
+  </div>`;
+}
+
+function startQ(){ S.qi=0; S.ans={}; S.shop=null; S.lookup='idle'; go('q'); }
+function qScreen(){
+  const q=Q[S.qi]; const cur=S.ans[q.id];
+  if(q.type==='addr') return addrScreen(q);
+  const opts=typeof q.opts==='function'?q.opts(S.ans):q.opts;
+  const title=typeof q.title==='function'?q.title(S.ans):q.title;
+  const sel=v=> q.multi ? (cur||[]).includes(v) : cur===v;
+  return `${topbar(`질문 ${S.qi+1} / ${Q.length}`)}
+  <div class="progress">${Q.map((_,i)=>`<i class="${i<S.qi?'on':i===S.qi?'now':''}"></i>`).join('')}</div>
+  <h1>${title}</h1>
+  <p class="lead">${q.lead}</p>
+  <div class="tiles ${opts.length<=2?'one':''} step-in" key="${q.id}">
+    ${opts.map(([ic,l])=>`<button class="tile ${sel(l)?'sel':''}" onclick="pick('${q.id}','${l}',${!!q.multi})">${ic?`<span class="ic">${ic}</span>`:''}<span>${l}</span></button>`).join('')}
+  </div>
+  <div class="grow"></div>
+  <div class="stack" style="margin-top:18px">
+    ${q.multi?`<button class="btn primary" onclick="nextQ()" ${(cur||[]).length?'':'disabled'}>다음으로</button>`:`<button class="btn ghost" onclick="pick('${q.id}','잘 모르겠어요',false)">잘 모르겠어요, 넘어갈게요</button>`}
+  </div>`;
+}
+function addrScreen(q){
+  const head=`${topbar(`질문 ${S.qi+1} / ${Q.length}`)}
+  <div class="progress">${Q.map((_,i)=>`<i class="${i<S.qi?'on':i===S.qi?'now':''}"></i>`).join('')}</div>`;
+  if(S.lookup==='loading'){
+    return `${head}<h1>가게를 찾고 있어요</h1><p class="lead">잠깐이면 돼요.</p>
+    <div class="card"><ul class="scan">
+      <li class="on">네이버 플레이스에서 가게 찾기</li>
+      <li class="on">등록된 사진 모으기</li>
+      <li class="on">방문자 리뷰 읽기</li>
+      <li>메뉴·가격·영업시간 정리</li>
+      <li>요즘 잘 되는 광고 형식과 맞춰 보기</li>
+    </ul></div>`;
+  }
+  if(S.lookup==='done' && S.shop){
+    const sh=S.shop;
+    return `${head}<span class="pill g">찾았어요</span><h1>이 가게가 맞나요?</h1>
+    <div class="card" style="padding:16px">
+      <h3 style="font-size:1.2em">${sh.name}</h3>
+      <div class="small">${sh.addr}<br>${sh.hours}</div>
+      <div class="row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><span class="pill y">★ ${sh.rating}</span><span class="pill n">리뷰 ${sh.reviews}개</span><span class="pill n">사진 ${sh.photos.length}장</span><span class="pill n">메뉴 ${sh.menu.length}개</span></div>
+      <div class="photos">${sh.photos.map(([l,c])=>`<span style="background:${c}">${l}</span>`).join('')}</div>
+      <div class="sec2">손님들이 제일 많이 한 말</div>
+      <div class="kws">${sh.keywords.slice(0,3).map(([k,n])=>`<span>${k} <b>${n}</b></span>`).join('')}</div>
+      <div class="small" style="margin-top:8px">출처: ${sh.src}</div>
+    </div>
+    <div class="grow"></div>
+    <div class="stack" style="margin-top:14px">
+      <button class="btn primary" onclick="S.ans.addr=S.shop.addr;nextQ()">네, 우리 가게예요</button>
+      <button class="btn ghost" onclick="S.lookup='idle';S.shop=null;render()">아니에요, 다시 찾을게요</button>
+    </div>`;
+  }
+  return `${head}<h1>${q.title}</h1><p class="lead">${q.lead}</p>
+  <div class="stack">
+    <input id="addr" class="input" placeholder="예: 서울 서대문구 이화여대길 52" value="${S.ans.addr||''}" inputmode="text">
+    <button class="btn primary" onclick="lookupShop()">우리 가게 찾기<span class="sub">사진·리뷰·메뉴를 자동으로 모아요</span></button>
+    <button class="btn secondary" style="min-height:56px" onclick="lookupShop()">주소 대신 가게 이름으로 찾기</button>
+  </div>
+  <div class="grow"></div>
+  <button class="btn ghost" onclick="S.ans.addr='건너뜀';nextQ()">주소는 나중에 알려줄게요</button>`;
+}
+function lookupShop(){
+  const v=(document.getElementById('addr')||{}).value||'';
+  S.lookup='loading'; render();
+  setTimeout(()=>{ S.shop=shopOf(S.ans); S.lookup='done'; render(); }, 1600);
+}
+function pick(id,v,multi){
+  if(multi){ const arr=S.ans[id]||[]; S.ans[id]=arr.includes(v)?arr.filter(x=>x!==v):[...arr,v]; render(); return; }
+  if(id==='biz' && S.ans.biz!==v){ delete S.ans.who; delete S.ans.pride; delete S.ans.goal; delete S.ans.addr; S.shop=null; S.lookup='idle'; }
+  S.ans[id]=v; render();
+  setTimeout(nextQ,260);
+}
+function nextQ(){ if(S.qi<Q.length-1){S.qi++;render()} else go('result'); }
+
+function resultScreen(){
+  const r=recommend(); const best=r[0];
+  const label=i=> i===0?['잘 맞아요','g']:i===1?['괜찮아요','b']:i===2?['나중에','n']:['이번엔 아니에요','n'];
+  return `${topbar('추천 결과')}
+  <span class="pill y">사장님 답 ${Object.keys(S.ans).length}개${S.shop?' + 가게 검색 결과':''}로 골랐어요</span>
+  <h1>${S.ans.biz||'우리 가게'}에<br>${MEDIA[best.k].name}가 잘 맞아요</h1>
+  <p class="lead">${best.why}. 아래에서 하나를 누르면 맡길 분을 보여 드려요.</p>
+  <div class="stack">
+    ${r.map((x,i)=>`<button class="fit ${i===0?'best':''} ${i>=2?'dim':''}" onclick="S.media='${x.k}';go('creators')">
+      <span class="ic">${MEDIA[x.k].ic}</span>
+      <span class="body"><div class="row" style="justify-content:space-between"><span class="name">${MEDIA[x.k].name}</span><span class="pill ${label(i)[1]}">${label(i)[0]}</span></div><div class="why">${x.why}</div></span>
+      <span class="arrow">›</span></button>`).join('')}
+  </div>
+  <div class="grow"></div>
+  <button class="btn ghost" style="margin-top:14px" onclick="go('trends')">먼저 다른 가게 광고를 구경할래요 ›</button>`;
+}
+
+function creatorsScreen(){
+  const m=MEDIA[S.media]; const biz=S.ans.biz;
+  const all=CREATORS[S.media]||[];
+  const list=all.filter(c=>!c.fit.length || !biz || c.fit.includes(biz)).sort((a,b)=>a.price-b.price);
+  const budget=S.ans.budget||'';
+  const inBudget=p=> budget.startsWith('10만원')?p<=100000: budget.startsWith('10만 ~')?p<=300000: budget.startsWith('30만')?p<=500000:true;
+  const grad=c=>`linear-gradient(160deg,${c.color}dd,${c.color}66)`;
+  return `${topbar(m.name)}
+  <h1>${m.name},<br>누구에게 맡길까요?</h1>
+  <p class="lead">가격과 할 일이 정해져 있어요. 흥정 안 하셔도 돼요. ${biz?`<b>${biz}</b>과 맞는 계정만 골랐어요.`:''}</p>
+  <div class="stack" style="gap:16px">
+    ${list.map(c=>{const av=avgViews(c); const mult=av&&c.followers?Math.round(av/c.followers):null; const idx=all.indexOf(c);
+    return `<div class="creator">
+      <div class="hd"><div class="avatar" style="background:${c.color}">${c.n.slice(0,c.n.length>2?1:2)}</div>
+        <div style="min-width:0"><div class="nm">${c.n} <span class="pill ${c.badge==='예시'?'n':'b'}">${c.badge}</span></div><div class="hnd">@${c.h} · ${c.area}</div></div></div>
+      <div class="meta" style="padding:0 16px">${c.type}</div>
+      <div class="nums">
+        <div><b>${c.followers!=null?fmtN(c.followers):c.f}</b><span>${c.followers!=null?'팔로워':'월 방문'}</span></div>
+        <div><b>${fmtN(c.posts)}</b><span>게시물</span></div>
+        <div><b>${av?fmtN(av):'—'}</b><span>릴스 평균 조회</span></div>
+      </div>
+      ${c.reels.length?`<div class="sec">최근 릴스 · 인스타그램에서 자동 수집</div>
+      <div class="reels">${c.reels.map(r=>`<span style="background:${grad(c)}"><span>${r[0]}</span><em>${r[1]?'👁 '+fmtN(r[1]):'게시물'}</em></span>`).join('')}</div>`:''}
+      <div class="why">${mult?`<b>팔로워의 ${mult}배</b>가 릴스를 봐요. `:''}${c.why}</div>
+      <div class="pk"><span>${c.pkg}</span></div>
+      <div class="pk" style="padding-top:4px"><span class="small">${c.days}일 안에 게시 · 맡김 산정 견적</span><span class="price">${won(c.price)}</span></div>
+      <div class="act"><button class="btn ${inBudget(c.price)?'primary':'secondary'}" onclick="S.creator=CREATORS['${S.media}'][${idx}];go('confirm')">${c.n}님께 맡기기${inBudget(c.price)?'':'<span class="sub">말씀하신 예산보다 조금 커요</span>'}</button></div>
+    </div>`}).join('')}
+  </div>
+  <p class="small" style="margin:14px 4px 0">팔로워·게시물·조회수는 인스타그램 공개 프로필에서 자동으로 가져와요 (9월 5일 기준). 견적은 맡김이 이 숫자로 계산한 금액이고, 사장님이 흥정하실 필요 없어요.</p>`;
+}
+function confirmScreen(){
+  const c=S.creator, m=MEDIA[S.media];
+  return `${topbar('확인하기')}
+  <h1>이렇게 맡길게요.<br>맞는지 봐 주세요.</h1>
+  <div class="card">
+    <dl class="kv">
+      <dt>누구에게</dt><dd>${c.n}님 (@${c.h})</dd>
+      <dt>무엇을</dt><dd>${m.name} · ${c.pkg}</dd>
+      <dt>언제까지</dt><dd>${c.days}일 안에 게시</dd>
+      <dt>얼마</dt><dd>${won(c.price)} <span class="small">(수수료 포함, 추가 비용 없음)</span></dd>
+    </dl>
+  </div>
+  <div class="card flat" style="margin-top:12px;font-size:.92em;color:var(--ink-2)">
+    <b style="color:var(--ink)">🔒 돈은 맡김이 보관해요.</b><br>영상을 보시고 "좋아요" 하셔야 ${c.n}님께 전달돼요. 마음에 안 들면 고쳐 달라고 하거나 돌려받을 수 있어요.
+  </div>
+  <h2>어떻게 내실래요?</h2>
+  <div class="tiles">
+    ${[['💳','카드로'],['🏦','계좌이체로'],['👨‍👩‍👧','자녀에게 결제 링크 보내기'],['🏪','가게 방문 수금 (상인회 제휴)']].map(([ic,l])=>`<button class="tile ${S.pay===l?'sel':''}" onclick="S.pay='${l}';render()"><span class="ic">${ic}</span><span>${l}</span></button>`).join('')}
+  </div>
+  <div class="grow"></div>
+  <button class="btn yellow" style="margin-top:18px;min-height:76px" ${S.pay?'':'disabled'} onclick="S.ordered=true;S.stage=0;go('brief');toast('접수됐어요')">${won(c.price)} 맡기기<span class="sub">${S.pay?S.pay+' 결제':'결제 방법을 먼저 골라 주세요'}</span></button>`;
+}
+
+function briefScreen(){
+  const b=briefText(); const c=S.creator; const a=S.ans; const sh=S.shop||shopOf(a); const m=MEDIA[S.media]||{};
+  const kw=sh.keywords.map(k=>k[0]); const likes=[...S.likes];
+  const styleLine = likes.length ? `사장님이 찜한 스타일 <mark>${likes.join(', ')}</mark>으로 가 주세요.` : `이 가게엔 <mark>${a.who&&a.who.includes('학부모')?'후기형·강의형':'과정형·공간형'}</mark>이 잘 맞아요.`;
+  const scenes=[sh.photos[0][0], sh.photos[1][0], sh.photos[2][0]];
+  const menuTop=sh.menu.slice(0,3).map(([n,p])=>`${n} ${p?won(p):'무료'}`).join(' · ');
+  return `${topbar('AI 브리핑')}
+  <span class="pill g">접수 완료</span>
+  <h1>${c.n}님께 보낼<br>브리핑을 만들었어요</h1>
+  <p class="lead">사장님 답 ${Object.keys(a).length}개와 가게 검색 결과를 합쳐서 썼어요. 틀린 게 있으면 고쳐 주세요.</p>
+  <div class="srcs"><span class="pill b">사장님 답변 ${Object.keys(a).length}개</span><span class="pill b">사진 ${sh.photos.length}장</span><span class="pill b">리뷰 ${sh.reviews}개</span><span class="pill b">메뉴 ${sh.menu.length}개</span>${likes.length?`<span class="pill y">찜한 스타일 ${likes.length}개</span>`:''}</div>
+  <div class="brief" style="margin-top:12px">
+    <div class="hd">${c.n}님께 보내는 작업지시서 · ${m.name}</div>
+    <h4>이 가게는</h4>
+    <p><mark>${sh.name}</mark> (${sh.addr}). 주 손님은 <mark>${b.who}</mark>, 자랑거리는 <mark>${b.pride}</mark>. 손님들이 리뷰에서 제일 많이 한 말은 <mark>"${kw[0]}"</mark>(${sh.keywords[0][1]}번)이고, 다음이 "${kw[1]}", "${kw[2]}"예요. 분위기: ${sh.vibe}.</p>
+    <h4>이번 광고의 목표</h4>
+    <p><mark>${b.goal}</mark>. 영상을 본 사람이 "${kw[0]}"를 기억하고 위치를 저장하게 만드는 게 핵심이에요.</p>
+    <h4>꼭 담을 장면 3개</h4>
+    <ul><li><b>${scenes[0]}</b> — 등록 사진 중 리뷰에 가장 많이 언급된 장면</li><li><b>${sh.signature}</b> — 대표 메뉴, 만드는 손이나 결과물 클로즈업</li><li><b>${scenes[2]}</b> — 가게가 어디인지 알 수 있는 컷 (입구·간판·창가)</li></ul>
+    <h4>손님 말 그대로 자막에 쓰세요</h4>
+    ${sh.quotes.slice(0,2).map(q=>`<p class="q">"${q}"</p>`).join('')}
+    <h4>톤 · 요즘 흐름</h4>
+    <p>${trendNoteFor(a)} ${styleLine}</p>
+    <h4>콘티 제안 (${m.name==='네이버 블로그'?'글 구성':'15~20초'})</h4>
+    <div class="conti">
+      <b>0–2초</b><span>${sh.signature.split(' + ')[0]} 결과물부터. 자막: "${kw[0].replace('요','')}, 이대 앞 ${a.biz==='학원·교육'?'학원':'가게'}"</span>
+      <b>3–10초</b><span>${scenes[0]} → ${scenes[1]} 순서로 훑기. 말 없이, 자막만.</span>
+      <b>11–15초</b><span>${a.photo==='찍어 둔 게 있어요'?'사장님이 주신 사진 1장 삽입':'사장님 인사 한 컷 (얼굴 나오면 신뢰↑)'}</span>
+      <b>마지막 3초</b><span>가격·위치 고정 자막: "${menuTop} · ${sh.addr.split(',')[0]}"</span>
+    </div>
+    <h4>이건 피해 주세요</h4>
+    <ul><li>가격은 검색 결과 기준으로 정확히 (${sh.menu[0][0]} ${sh.menu[0][1]?won(sh.menu[0][1]):'무료'})</li><li>손님 얼굴이 나오는 컷은 쓰지 않기</li><li>리뷰에 없는 표현("최고", "1위") 넣지 않기</li></ul>
+    <h4>게시 추천 시점</h4>
+    <p>${sh.best}. 게시 전에 사장님 확인을 받아 주세요.</p>
+    <p class="small" style="margin-top:12px">촬영: ${a.photo==='찍어 둔 게 있어요'?'사장님 보유 사진·영상 사용':'방문 촬영'} · 결과물: ${m.name} · ${b.pkg}</p>
+  </div>
+  <div class="grow"></div>
+  <div class="stack" style="margin-top:18px">
+    <button class="btn primary" onclick="go('progress');toast('크리에이터에게 전달됐어요')">맞아요, 이대로 보내 주세요</button>
+    <button class="btn ghost" onclick="toast('고칠 부분을 고르는 화면(시연 생략)')">고칠 게 있어요</button>
+  </div>`;
+}
+
+const STAGES=[
+  {t:'접수 완료',s:'결제금은 맡김이 보관 중'},
+  {t:'크리에이터가 가게에 와요',s:'9월 9일(화) 오후 2시 방문 · 30분'},
+  {t:'영상 확인해 주세요',s:'사장님 할 일 · 네/아니요 한 번'},
+  {t:'게시 중',s:'2주 동안 올라가 있어요'},
+  {t:'결과 나왔어요',s:'문장으로 정리해 드렸어요'},
+];
+function progressScreen(){
+  const c=S.creator;
+  return `${topbar('진행 현황')}
+  <h1>${c.n}님이 진행 중이에요</h1>
+  <p class="lead">단계가 바뀌면 카카오톡으로 알려 드려요. 사장님이 하실 일은 한 번뿐이에요.</p>
+  <ul class="timeline">
+    ${STAGES.map((st,i)=>`<li class="${i<S.stage?'done':i===S.stage?'now':'wait'}"><span class="dot">${i<S.stage?'✓':i+1}</span><div><div class="t">${st.t}</div><div class="s">${st.s}</div>
+      ${i===2&&S.stage===2?`<button class="btn yellow" style="margin-top:10px;min-height:56px" onclick="go('review')">영상 보고 답하기</button>`:''}
+      ${i===4&&S.stage===4?`<button class="btn primary" style="margin-top:10px;min-height:56px" onclick="go('result2')">결과 보기</button>`:''}
+    </div></li>`).join('')}
+  </ul>
+  <div class="grow"></div>
+  ${S.stage<2||S.stage===3?`<button class="btn ghost" onclick="S.stage++;render();toast('(시연) 다음 단계로 넘어갔어요')">▶ 시연용 · 시간을 앞으로</button>`:''}
+  <button class="btn ghost" onclick="S.history=[];go('home',false)">홈으로</button>`;
+}
+
+function reviewScreen(){
+  const c=S.creator; const m=MEDIA[S.media];
+  if(S.review==='no'){
+    return `${topbar('고쳐 달라고 하기')}
+    <h1>어떤 점이 마음에 안 드세요?</h1>
+    <p class="lead">고르시면 ${c.n}님께 그대로 전달돼요.</p>
+    <div class="tiles">
+      ${[['🏪','우리 가게가 잘 안 보여요'],['💰','가격·메뉴가 틀렸어요'],['🎭','분위기가 우리랑 안 맞아요'],['🗣️','말이 너무 빨라요'],['📍','위치 안내가 없어요'],['✍️','직접 말할게요 (전화)']].map(([ic,l])=>`<button class="tile" onclick="S.review=null;go('progress');toast('${c.n}님께 전달했어요 · 2일 안에 다시 올려요')"><span class="ic">${ic}</span><span>${l}</span></button>`).join('')}
+    </div>
+    <div class="grow"></div>
+    <button class="btn ghost" onclick="S.review=null;render()">돌아가기</button>`;
+  }
+  return `${topbar('영상 확인')}
+  <h1>이대로 올릴까요?</h1>
+  <p class="lead">${c.n}님이 만든 ${m.name} 영상이에요. 눌러서 보세요.</p>
+  <div class="video" onclick="toast('시연용 영상 자리예요')"><div class="cap">"거지 백수의 이대 앞 혼놀 카페"</div><div class="by">${m.name} · ${c.n} · 0:28</div></div>
+  <div class="grow"></div>
+  <div class="stack" style="margin-top:18px">
+    <button class="btn primary" style="min-height:76px" onclick="S.stage=3;go('progress');toast('좋아요! 게시되고, 결제금이 전달됐어요')">네, 좋아요<span class="sub">게시하고 ${c.n}님께 돈을 보내요</span></button>
+    <button class="btn danger" onclick="S.review='no';render()">아니요, 고쳐 주세요</button>
+  </div>`;
+}
+
+function result2Screen(){
+  const c=S.creator, m=MEDIA[S.media];
+  const stats=[[3240,'명이 영상을 봤어요',100],[186,'명이 가게 정보를 눌러봤어요',48],[45,'명이 가게 위치를 저장했어요',22],[12,'명이 전화 버튼을 눌렀어요',9]];
+  return `${topbar('광고 결과')}
+  <span class="pill g">2주 게시 끝</span>
+  <h1>이번 광고,<br>이렇게 됐어요</h1>
+  <p class="lead">${c.n}님 ${m.name} · 9월 12일 ~ 26일</p>
+  <div class="card" style="padding:6px 18px">
+    ${stats.map(([n,l,p])=>`<div class="stat"><span class="n">${n.toLocaleString()}</span><span class="l" style="flex:1">${l}<div class="bar"><i style="width:${p}%"></i></div></span></div>`).join('')}
+  </div>
+  <p class="small" style="margin:12px 4px 0">비슷한 가게들과 견주면 <b style="color:var(--green)">위치 저장이 많은 편</b>이에요. 근처에서 찾아올 손님이 생겼다는 뜻이에요.</p>
+  <div class="grow"></div>
+  <div class="stack" style="margin-top:18px">
+    <button class="btn primary" style="min-height:76px" onclick="S.pay='카드로';go('confirm');toast('같은 조건으로 다시 준비했어요')">${c.n}님께 또 맡기기<span class="sub">같은 조건 · ${won(c.price)} · 답 다시 안 해도 돼요</span></button>
+    <button class="btn secondary" onclick="go('result')">다른 종류 광고 해보기</button>
+    <button class="btn ghost" onclick="S.ordered=false;S.stage=0;S.history=[];go('home',false)">이번엔 여기까지</button>
+  </div>`;
+}
+
+function trendsScreen(){
+  const cats=['전체','음식점','카페·빵집','미용·뷰티','마트·소매','학원·교육','기타 서비스'];
+  const list=TRENDS.filter(t=>S.trendFilter==='전체'||t.biz.includes(S.trendFilter));
+  return `${topbar('요즘 광고 구경')}
+  <h1>요즘 가게들은<br>이렇게 광고해요</h1>
+  <p class="lead">마음에 드는 걸 <b>"우리 가게도 이렇게"</b> 눌러 두세요. 추천할 때 반영돼요.</p>
+  <div class="chips">${cats.map(c=>`<button class="${S.trendFilter===c?'on':''}" onclick="S.trendFilter='${c}';render()">${c}</button>`).join('')}</div>
+  <div class="feed" style="margin-top:8px">
+    ${list.map(t=>`<div class="reel"><div class="thumb" style="background:${t.g}"><b>${t.t}</b></div>
+      <div class="bd"><span class="pill n">${t.k}</span><p>${t.d}</p>
+      <button class="like ${S.likes.has(t.k)?'on':''}" onclick="S.likes.has('${t.k}')?S.likes.delete('${t.k}'):S.likes.add('${t.k}');render()">${S.likes.has(t.k)?'✓ 우리 가게도 이렇게 (찜함)':'우리 가게도 이렇게'}</button></div></div>`).join('')}
+  </div>
+  <div class="stack" style="margin-top:18px">
+    <button class="btn primary" onclick="startQ()">이제 광고 맡기러 가기${S.likes.size?`<span class="sub">찜한 스타일 ${S.likes.size}개 반영</span>`:''}</button>
+  </div>`;
+}
+
+/* ---------------- render ---------------- */
+const SCREENS={home:homeScreen,q:qScreen,result:resultScreen,creators:creatorsScreen,confirm:confirmScreen,brief:briefScreen,progress:progressScreen,review:reviewScreen,result2:result2Screen,trends:trendsScreen};
+function render(){
+  document.documentElement.style.setProperty('--fs',S.big?'1.22':'1');
+  const el=$('#screen'); el.innerHTML=SCREENS[S.screen](); el.scrollTop=0;
+  const sd=SIDE[S.screen]; $('#side-now').textContent=sd.t; $('#side-desc').textContent=sd.d;
+  const maxDone=Math.max(-1,...sd.chain);
+  $('#chain').innerHTML=CHAIN.map((c,i)=>`<li class="${sd.chain.includes(i)?(i===maxDone?'now':'done'):''}"><i></i>${c}</li>`).join('');
+}
+function demo(sc){
+  if(!S.ans.who){S.ans={biz:S.ans.biz||'카페·빵집',addr:SHOPS['카페·빵집'].addr,who:'대학생',pride:['착한 가격','공부·작업하기 좋은 자리'],goal:'새 손님이 찾아오게',budget:'10만 ~ 30만원',photo:'없어요, 와서 찍어 주세요'}; S.shop=shopOf(S.ans); S.lookup='done';}
+  if(!S.media) S.media='reels'; if(!S.creator) S.creator=REAL.nyol;
+  if(['brief','progress','review','result2'].includes(sc)){S.ordered=true; S.pay=S.pay||'카드로'}
+  if(sc==='review') S.stage=2; if(sc==='result2') S.stage=4; if(sc==='progress'&&S.stage===0) S.stage=1;
+  S.history=[]; go(sc,false);
+}
+$('#jump').innerHTML=Object.keys(SIDE).map(k=>`<button onclick="demo('${k}')">${SIDE[k].t}</button>`).join('');
+(function clock(){const d=new Date();$('#clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');setTimeout(clock,30000)})();
+render();
+</script>
+
+</body></html>
