@@ -1,6 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
-<title>맡김</title>
+<!doctype html><html lang="ko"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style><title>맡김 · 사장님 광고, 맡기기만 하세요</title>
+<meta name="description" content="맡김 — 사장님 광고, 맡기기만 하세요. 시연용 프로토타입.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Gowun+Batang:wght@700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23F4E9D2'/%3E%3Cpath d='M50 32c18 0 34 13 34 30 0 16-14 26-34 26S16 78 16 62c0-17 16-30 34-30z' fill='%231F6F4E'/%3E%3Cpath d='M37 62l10 10 18-20' fill='none' stroke='%23F4E9D2' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head><body>
 <style>
 :root{
   --bg:#ECEAE0; --paper:#FAF7F0; --surface:#FFFFFF; --ink:#1C2620; --ink-2:#4A554F; --muted:#7A847E;
@@ -424,10 +427,10 @@ const SIDE = {
   q:         {t:'프로토콜 질문', d:'한 화면에 질문 하나, 답은 누르기만. 주소를 넣으면 AI가 가게를 검색해 사진·리뷰·메뉴를 모아 오고, 이 답들이 그대로 브리핑이 됩니다.', chain:[0]},
   result:    {t:'추천 결과', d:'"왜 이 광고가 맞는지"를 사장님 말로 설명. AI 채팅과 다른 점은 이 다음 화면부터입니다.', chain:[0]},
   creators:  {t:'크리에이터 고르기', d:'고정 패키지·고정 가격. 흥정 없이 고르기만. 팔로워·게시물·릴스 조회수는 인스타그램 공개 프로필에서 자동 수집해 견적을 산정.', chain:[0,1]},
-  confirm:   {t:'확인·결제', d:'돈은 맡김이 보관(에스크로). 자녀가 대신 결제하는 길도 열어둠.', chain:[0,1,2,5]},
+  confirm:   {t:'확인·결제', d:'결제금은 토스페이먼츠가 보관(에스크로). 사장님이 "좋아요"를 눌러야 크리에이터에게 전송됨. 맡김은 돈을 직접 갖고 있지 않음. 자녀가 대신 결제하는 길도 열어둠.', chain:[0,1,2,5]},
   brief:     {t:'AI 브리핑', d:'사장님 답 + 주소로 검색한 사진·리뷰·메뉴 + 요즘 릴스 흐름을 합쳐 콘티까지 써 줌. 사장님은 설명할 게 없고, 크리에이터는 물어볼 게 없음.', chain:[0,1,2,3,5]},
   progress:  {t:'진행 현황', d:'사장님이 할 일은 "네/아니요" 한 번. 나머지는 맡김이 카톡으로 알려줌.', chain:[0,1,2,3,4,5]},
-  review:    {t:'영상 확인', d:'검수도 프로토콜. 고칠 이유를 고르면 크리에이터에게 그대로 전달.', chain:[0,1,2,3,4,5]},
+  review:    {t:'영상 확인', d:'검수도 프로토콜. 사장님의 "좋아요"가 곧 송금 신호 — 이때 토스페이먼츠가 보관하던 돈이 크리에이터에게 전송됨. 고칠 이유를 고르면 크리에이터에게 그대로 전달.', chain:[0,1,2,3,4,5]},
   result2:   {t:'광고 결과', d:'조회수 그래프 대신 문장. 그리고 "같은 분께 또" 버튼 하나로 재의뢰.', chain:[0,1,2,3,4,5,6,7]},
   trends:    {t:'요즘 광고 구경', d:'부가 기능. 마음에 드는 걸 찜하면 추천 결과에 반영됨. 사장님이 안목을 기르는 단계.', chain:[]},
 };
@@ -655,7 +658,7 @@ function confirmScreen(){
     </dl>
   </div>
   <div class="card flat" style="margin-top:12px;font-size:.92em;color:var(--ink-2)">
-    <b style="color:var(--ink)">🔒 돈은 맡김이 보관해요.</b><br>영상을 보시고 "좋아요" 하셔야 ${c.n}님께 전달돼요. 마음에 안 들면 고쳐 달라고 하거나 돌려받을 수 있어요.
+    <b style="color:var(--ink)">🔒 돈은 토스페이먼츠가 보관해요.</b><br>맡김이 아니라 결제사(토스페이먼츠)가 안전하게 맡아 둬요. 사장님이 영상을 보시고 <b style="color:var(--ink)">"좋아요"</b>를 누르셔야 ${c.n}님께 전송돼요. 마음에 안 들면 고쳐 달라고 하거나 돌려받을 수 있어요.
   </div>
   <h2>어떻게 내실래요?</h2>
   <div class="tiles">
@@ -709,7 +712,7 @@ function briefScreen(){
 }
 
 const STAGES=[
-  {t:'접수 완료',s:'결제금은 맡김이 보관 중'},
+  {t:'접수 완료',s:'결제금은 토스페이먼츠가 보관 중'},
   {t:'크리에이터가 가게에 와요',s:'9월 9일(화) 오후 2시 방문 · 30분'},
   {t:'영상 확인해 주세요',s:'사장님 할 일 · 네/아니요 한 번'},
   {t:'게시 중',s:'2주 동안 올라가 있어요'},
@@ -749,7 +752,7 @@ function reviewScreen(){
   <div class="video" onclick="toast('시연용 영상 자리예요')"><div class="cap">"거지 백수의 이대 앞 혼놀 카페"</div><div class="by">${m.name} · ${c.n} · 0:28</div></div>
   <div class="grow"></div>
   <div class="stack" style="margin-top:18px">
-    <button class="btn primary" style="min-height:76px" onclick="S.stage=3;go('progress');toast('좋아요! 게시되고, 결제금이 전달됐어요')">네, 좋아요<span class="sub">게시하고 ${c.n}님께 돈을 보내요</span></button>
+    <button class="btn primary" style="min-height:76px" onclick="S.stage=3;go('progress');toast('좋아요! 토스페이먼츠가 결제금을 보냈어요')">네, 좋아요<span class="sub">이 버튼을 누르면 토스페이먼츠가 보관 중인 돈을 ${c.n}님께 보내요</span></button>
     <button class="btn danger" onclick="S.review='no';render()">아니요, 고쳐 주세요</button>
   </div>`;
 }
